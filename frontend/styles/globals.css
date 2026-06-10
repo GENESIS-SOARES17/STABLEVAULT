@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  transition: all 0.5s ease;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.5s ease;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #00f3ff 0%, #b829dd 50%, #ff00ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold transition-all hover:scale-105 text-white;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg font-semibold transition-all hover:scale-105 text-white;
+}
+
+.news-ticker { animation: scroll 60s linear infinite; }
+@keyframes scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.card-hover { transition: all 0.3s ease; }
+.card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2); }
+
+/* Glow Animations */
+@keyframes pulse-glow-cyan {
+  0% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 243, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); }
+}
+
+@keyframes pulse-glow-pink {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(255, 0, 110, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0); }
+}
+
+@keyframes pulse-glow-purple {
+  0% { box-shadow: 0 0 0 0 rgba(123, 44, 191, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(123, 44, 191, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(123, 44, 191, 0); }
+}
+
+.btn-glow-cyan { animation: pulse-glow-cyan 2s infinite; }
+.btn-glow-pink { animation: pulse-glow-pink 2s infinite; }
+.btn-glow-purple { animation: pulse-glow-purple 2s infinite; }
+
+button:disabled.btn-glow-cyan,
+button:disabled.btn-glow-pink,
+button:disabled.btn-glow-purple {
+  animation: none;
+  box-shadow: none;
+}

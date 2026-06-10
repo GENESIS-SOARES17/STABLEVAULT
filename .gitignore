@@ -1,0 +1,36 @@
+# Dependências
+node_modules/
+.pnp/
+.pnp.js
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Builds
+dist/
+build/
+.next/
+out/
+
+# Hardhat
+artifacts/
+cache/
+coverage/
+coverage.json
+typechain-types/
+
+# Arquivos locais
+.DS_Store
+*.log
+.env
+.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+**/PRIVATE_KEY*
+**/private-key*

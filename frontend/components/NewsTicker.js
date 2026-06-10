@@ -1,0 +1,7 @@
+import { useState, useEffect } from 'react';
+export default function NewsTicker() {
+  const [prices, setPrices] = useState({ bitcoin: { usd: 67000, usd_24h_change: 2.5 }, ethereum: { usd: 3500, usd_24h_change: 1.8 }, tether: { usd: 1.00, usd_24h_change: 0.01 } });
+  useEffect(() => { const fetchPrices = async () => { try { const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd&include_24hr_change=true'); const data = await res.json(); setPrices(data); } catch(e) {} }; fetchPrices(); const interval = setInterval(fetchPrices, 300000); return () => clearInterval(interval); }, []);
+  const coins = [{ id: 'bitcoin', name: 'BTC', icon: '₿' }, { id: 'ethereum', name: 'ETH', icon: 'Ξ' }, { id: 'tether', name: 'USDT', icon: '₮' }];
+  return <div className="bg-black/50 backdrop-blur-sm border-b border-cyan-500/20 py-2 overflow-hidden"><div className="flex animate-marquee whitespace-nowrap">{coins.map((coin,i) => { const price = prices[coin.id]; const change = price?.usd_24h_change || 0; const isPositive = change >= 0; return <div key={i} className="flex items-center gap-2 mx-8"><span className="text-2xl">{coin.icon}</span><span className="text-white font-bold">{coin.name}</span><span className="text-gray-300">${price?.usd?.toLocaleString() || '0'}</span><span className={`text-sm font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>{isPositive ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%</span></div>; })}</div></div>;
+}
