@@ -5,6 +5,7 @@ import { defineChain } from 'viem';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '../context/ThemeContext';
+import { useEffect, useState } from 'react';
 
 const liteforge = defineChain({
   id: 4441,
@@ -23,6 +24,11 @@ const config = createConfig({
 const queryClient = new QueryClient();
 
 export default function MyApp({ Component, pageProps }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
