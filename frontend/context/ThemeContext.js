@@ -31,12 +31,28 @@ export const THEMES = {
 
 export function ThemeProvider({ children }) {
   const [currentTheme, setCurrentTheme] = useState('cyberpunk');
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem('lit-vault-theme');
     if (saved && THEMES[saved]) setCurrentTheme(saved);
   }, []);
-  const changeTheme = (themeId) => { setCurrentTheme(themeId); localStorage.setItem('lit-vault-theme', themeId); };
-  return <ThemeContext.Provider value={{ currentTheme, changeTheme, themes: THEMES }}>{children}</ThemeContext.Provider>;
+
+  const changeTheme = (themeId) => {
+    setCurrentTheme(themeId);
+    if (mounted) localStorage.setItem('lit-vault-theme', themeId);
+  };
+
+  if (!mounted) {
+    return <div style={{ visibility: 'hidden' }}>{children}</div>;
+  }
+
+  return (
+    <ThemeContext.Provider value={{ currentTheme, changeTheme, themes: THEMES }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() { return useContext(ThemeContext); }

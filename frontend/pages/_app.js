@@ -52,5 +52,18 @@ function AppContent({ Component, pageProps }) {
 }
 
 export default function MyApp({ Component, pageProps }) {
-  return (<WagmiProvider config={config}><QueryClientProvider client={queryClient}><RainbowKitProvider theme={darkTheme({ accentColor: '#00f3ff', borderRadius: 'large' })}><ThemeProvider><AppContent Component={Component} pageProps={pageProps} /></ThemeProvider></RainbowKitProvider></QueryClientProvider></WagmiProvider>);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme({ accentColor: '#00f3ff', borderRadius: 'large' })}>
+          <ThemeProvider>
+            <AppContent Component={Component} pageProps={pageProps} />
+          </ThemeProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
 }
