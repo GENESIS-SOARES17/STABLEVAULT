@@ -3,7 +3,7 @@ node_modules/
 .pnp/
 .pnp.js
 
-# Arquivos de ambiente
+# Ambiente
 .env
 .env.local
 .env.*.local
@@ -14,23 +14,27 @@ build/
 .next/
 out/
 
-# Hardhat
+# Hardhat / Backend
 artifacts/
 cache/
 coverage/
 coverage.json
 typechain-types/
+.hardhat/
 
 # Arquivos locais
 .DS_Store
 *.log
-.env
-.env.example
+
+# Secrets
+**/PRIVATE_KEY*
+**/private-key*
 
 # IDE
 .vscode/
 .idea/
 
-# Secrets
-**/PRIVATE_KEY*
-**/private-key*
+# Outros
+*.swp
+*.swo
+*~
