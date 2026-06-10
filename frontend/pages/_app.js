@@ -1,4 +1,3 @@
-import React from 'react';
 import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { WagmiProvider, createConfig, http } from 'wagmi';
@@ -24,10 +23,6 @@ const config = createConfig({
 const queryClient = new QueryClient();
 
 export default function MyApp({ Component, pageProps }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
