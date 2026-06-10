@@ -34,18 +34,18 @@ export function ThemeProvider({ children }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const saved = localStorage.getItem('lit-vault-theme');
     if (saved && THEMES[saved]) setCurrentTheme(saved);
+    setMounted(true);
   }, []);
 
   const changeTheme = (themeId) => {
     setCurrentTheme(themeId);
-    if (mounted) localStorage.setItem('lit-vault-theme', themeId);
+    if (typeof window !== 'undefined') localStorage.setItem('lit-vault-theme', themeId);
   };
 
   if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
+    return <>{children}</>;
   }
 
   return (
@@ -55,4 +55,10 @@ export function ThemeProvider({ children }) {
   );
 }
 
-export function useTheme() { return useContext(ThemeContext); }
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+}
