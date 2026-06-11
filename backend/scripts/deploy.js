@@ -16,9 +16,15 @@ async function main() {
   console.log("👤 Deployer:", deployer.address);
 
   const StableVault = await ethers.getContractFactory("StableVault");
-  const vault = await StableVault.deploy(LTUSDC_ADDRESS, AIRDROP_AMOUNT, MINT_AMOUNT, MINT_FEE, MONTHLY_RATE_BPS);
+  const vault = await StableVault.deploy(
+    LTUSDC_ADDRESS,
+    AIRDROP_AMOUNT,
+    MINT_AMOUNT,
+    MINT_FEE,
+    MONTHLY_RATE_BPS
+  );
   await vault.waitForDeployment();
-  const vaultAddress = await vault.getAddress();
+  const vaultAddress = await vault.getAddress(); // ✅ corrigido
   console.log("✅ StableVault deployed to:", vaultAddress);
 
   const LTUSDC = await ethers.getContractAt("IERC20", LTUSDC_ADDRESS);
@@ -27,7 +33,11 @@ async function main() {
   console.log("✅ StableVault funded with", ethers.formatUnits(INITIAL_SUPPLY, 18), "LTUSDC");
 
   let env = fs.readFileSync(".env", "utf8");
-  env = env.replace(/CONTRACT_ADDRESS=.*/, "CONTRACT_ADDRESS=" + vaultAddress);
+  if (env.includes("CONTRACT_ADDRESS=")) {
+    env = env.replace(/CONTRACT_ADDRESS=.*/, "CONTRACT_ADDRESS=" + vaultAddress);
+  } else {
+    env += "\nCONTRACT_ADDRESS=" + vaultAddress;
+  }
   fs.writeFileSync(".env", env);
   console.log("💾 Contract address saved to .env");
 }

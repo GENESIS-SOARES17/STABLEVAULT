@@ -18,105 +18,25 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('airdrop');
   const { showToast } = useToast();
 
-  const enabled = !!address && CONTRACT_ADDRESS !== "0x0";
+  const enabled = !!address && CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000";
 
-  // Dados dos contratos
-  const { data: airdropAmount } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'airdropAmount',
-    query: { enabled }
-  });
-  const { data: mintAmount } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'mintAmount',
-    query: { enabled }
-  });
-  const { data: mintFee } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'mintFee',
-    query: { enabled }
-  });
-  const { data: hasClaimed } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getAirdropStatus',
-    args: [address],
-    query: { enabled }
-  });
-  const { data: poolTVL } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getTotalValueLocked',
-    query: { enabled: CONTRACT_ADDRESS !== "0x0" }
-  });
-  const { data: poolUsers } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getTotalDepositors',
-    query: { enabled: CONTRACT_ADDRESS !== "0x0" }
-  });
-  const { data: stakeTVL } = useReadContract({
-    address: STAKE_CONTRACT_ADDRESS,
-    abi: STAKE_ABI,
-    functionName: 'getTotalStaked',
-    query: { enabled: STAKE_CONTRACT_ADDRESS !== "0x0" }
-  });
-  const { data: stakeUsers } = useReadContract({
-    address: STAKE_CONTRACT_ADDRESS,
-    abi: STAKE_ABI,
-    functionName: 'getTotalStakers',
-    query: { enabled: STAKE_CONTRACT_ADDRESS !== "0x0" }
-  });
+  const { data: airdropAmount } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'airdropAmount', query: { enabled } });
+  const { data: mintAmount } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'mintAmount', query: { enabled } });
+  const { data: mintFee } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'mintFee', query: { enabled } });
+  const { data: hasClaimed } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getAirdropStatus', args: [address], query: { enabled } });
+  const { data: poolTVL } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalValueLocked', query: { enabled: !!CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "0x0" } });
+  const { data: poolUsers } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalDepositors', query: { enabled: !!CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "0x0" } });
+  const { data: stakeTVL } = useReadContract({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStaked', query: { enabled: !!STAKE_CONTRACT_ADDRESS && STAKE_CONTRACT_ADDRESS !== "0x0" } });
+  const { data: stakeUsers } = useReadContract({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStakers', query: { enabled: !!STAKE_CONTRACT_ADDRESS && STAKE_CONTRACT_ADDRESS !== "0x0" } });
 
   const { writeContractAsync } = useWriteContract();
 
   const handleClaimAirdrop = async () => {
-    console.log("🔵 Claim button clicked");
-    try {
-      setLoading(true);
-      setLastTxHash(null);
-      console.log("🔵 Calling writeContractAsync for claimAirdrop...");
-      const hash = await writeContractAsync({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'claimAirdrop'
-      });
-      console.log("✅ Transaction sent, hash:", hash);
-      setLastTxHash(hash);
-      showToast(`Airdrop de 500 LTUSDC recebido!`, 'success');
-    } catch (e) {
-      console.error("❌ Detailed error:", e);
-      showToast(`Erro: ${e.shortMessage || e.message}`, 'error');
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); setLastTxHash(null); const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'claimAirdrop' }); setLastTxHash(hash); showToast(`Airdrop de 500 LTUSDC recebido!`, 'success'); } catch (e) { showToast(`Erro: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
   };
 
   const handleMint = async () => {
-    console.log("🔵 Mint button clicked");
-    try {
-      setLoading(true);
-      setLastTxHash(null);
-      const fee = mintFee || parseEther('0.0001');
-      console.log("🔵 Mint fee:", fee.toString());
-      const hash = await writeContractAsync({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'mintLTUSDC',
-        value: fee
-      });
-      console.log("✅ Mint transaction sent, hash:", hash);
-      setLastTxHash(hash);
-      showToast(`Mintado 100 LTUSDC!`, 'success');
-    } catch (e) {
-      console.error("❌ Mint error:", e);
-      showToast(`Erro: ${e.shortMessage || e.message}`, 'error');
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); setLastTxHash(null); const fee = mintFee || parseEther('0.0001'); const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'mintLTUSDC', value: fee }); setLastTxHash(hash); showToast(`Mintado 100 LTUSDC!`, 'success'); } catch (e) { showToast(`Erro: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
   };
 
   const airdropValue = airdropAmount ? formatUnits(airdropAmount, 18) : '500';

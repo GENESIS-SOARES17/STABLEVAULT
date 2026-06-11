@@ -20,21 +20,11 @@ export default function Pool() {
 
   const enabled = !!address && CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000";
 
-  const { data: balance, refetch: refetchBalance } = useReadContract({
-    address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'balanceOf', args: [address], query: { enabled, refetchInterval: 10000 }
-  });
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'allowance', args: [address, CONTRACT_ADDRESS], query: { enabled, refetchInterval: 10000 }
-  });
-  const { data: depositInfo, refetch: refetchDeposit } = useReadContract({
-    address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getDepositInfo', args: [address], query: { enabled, refetchInterval: 10000 }
-  });
-  const { data: totalValueLocked, refetch: refetchTVL } = useReadContract({
-    address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalValueLocked', query: { enabled, refetchInterval: 10000 }
-  });
-  const { data: totalDepositors, refetch: refetchDepositors } = useReadContract({
-    address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalDepositors', query: { enabled, refetchInterval: 10000 }
-  });
+  const { data: balance, refetch: refetchBalance } = useReadContract({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'balanceOf', args: [address], query: { enabled, refetchInterval: 10000 } });
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'allowance', args: [address, CONTRACT_ADDRESS], query: { enabled, refetchInterval: 10000 } });
+  const { data: depositInfo, refetch: refetchDeposit } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getDepositInfo', args: [address], query: { enabled, refetchInterval: 10000 } });
+  const { data: totalValueLocked, refetch: refetchTVL } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalValueLocked', query: { enabled, refetchInterval: 10000 } });
+  const { data: totalDepositors, refetch: refetchDepositors } = useReadContract({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'getTotalDepositors', query: { enabled, refetchInterval: 10000 } });
 
   const { writeContractAsync } = useWriteContract();
 
@@ -46,19 +36,13 @@ export default function Pool() {
       const allowanceNum = allowance ? Number(formatUnits(allowance, 18)) : 0;
       if (allowanceNum < amountNum) {
         showToast('Approving LTUSDC...', 'info');
-        const approveHash = await writeContractAsync({
-          address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'approve',
-          args: [CONTRACT_ADDRESS, parseUnits((amountNum * 2).toString(), 18)]
-        });
+        const approveHash = await writeContractAsync({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'approve', args: [CONTRACT_ADDRESS, parseUnits((amountNum * 2).toString(), 18)] });
         showToast(`Approved!`, 'success');
         setLastTxHash(approveHash);
         await new Promise(resolve => setTimeout(resolve, 3000));
         await refetchAllowance();
       }
-      const hash = await writeContractAsync({
-        address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'deposit',
-        args: [parseUnits(depositAmount, 18)]
-      });
+      const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'deposit', args: [parseUnits(depositAmount, 18)] });
       setLastTxHash(hash);
       showToast(`Deposited ${depositAmount} LTUSDC!`, 'success');
       setDepositAmount('');
@@ -66,39 +50,26 @@ export default function Pool() {
     } catch (e) { showToast(`Error: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
   };
 
-const handlePartialWithdraw = async () => {
-    if (!depositInfo || Number(depositInfo[0]) === 0) { showToast("No deposit found", "warning"); return; }
-    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) { showToast("Enter a valid amount", "warning"); return; }
+  const handlePartialWithdraw = async () => {
+    if (!depositInfo || Number(depositInfo[0]) === 0) { showToast('No deposit found', 'warning'); return; }
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) { showToast('Enter a valid amount', 'warning'); return; }
     const principal = Number(formatUnits(depositInfo[0], 18));
-    const amountNum = parseFloat(withdrawAmount);
-    if (amountNum >= principal) { showToast("Use Withdraw All to withdraw the full amount", "info"); return; }
+    if (parseFloat(withdrawAmount) > principal) { showToast('Amount exceeds deposit', 'warning'); return; }
     try {
-        setLoading(true);
-        setLastTxHash(null);
-        console.log("🔵 Partial withdraw amount:", amountNum);
-        const hash = await writeContractAsync({
-            address: CONTRACT_ADDRESS,
-            abi: CONTRACT_ABI,
-            functionName: "partialWithdraw",
-            args: [parseUnits(amountNum.toString(), 18)]
-        });
-        setLastTxHash(hash);
-        showToast(`Withdrew ${amountNum} LTUSDC!`, "success");
-        setWithdrawAmount("");
-        await Promise.all([refetchBalance(), refetchDeposit(), refetchTVL(), refetchDepositors()]);
-    } catch (e) {
-        console.error("❌ Partial withdraw error:", e);
-        showToast(`Error: ${e.shortMessage || e.message}`, "error");
-    } finally { setLoading(false); }
-}
+      setLoading(true); setLastTxHash(null);
+      const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'partialWithdraw', args: [parseUnits(withdrawAmount, 18)] });
+      setLastTxHash(hash);
+      showToast(`Withdrew ${withdrawAmount} LTUSDC!`, 'success');
+      setWithdrawAmount('');
+      await Promise.all([refetchBalance(), refetchDeposit(), refetchTVL(), refetchDepositors()]);
+    } catch (e) { showToast(`Error: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
+  };
 
   const handleFullWithdraw = async () => {
     if (!depositInfo || Number(depositInfo[0]) === 0) { showToast('No deposit found', 'warning'); return; }
     try {
       setLoading(true); setLastTxHash(null);
-      const hash = await writeContractAsync({
-        address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'withdraw'
-      });
+      const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'withdraw', args: [] });
       setLastTxHash(hash);
       showToast(`Withdrawn successfully!`, 'success');
       await Promise.all([refetchBalance(), refetchDeposit(), refetchTVL(), refetchDepositors()]);
@@ -152,7 +123,7 @@ const handlePartialWithdraw = async () => {
                     <div className="flex justify-between p-3 bg-cyan-500/10 rounded-lg"><span className="text-gray-400">Accumulated Interest:</span><span className="text-cyan-400 font-bold text-lg">+{interest.toFixed(4)} LTUSDC</span></div>
                     <div className="flex justify-between p-3 bg-green-500/10 rounded-lg"><span className="text-gray-400">Total Value:</span><span className="text-green-400 font-bold text-xl">{total.toFixed(4)} LTUSDC</span></div>
                   </div>
-                  <div className="pt-4 border-t border-gray-700"><h4 className="text-sm font-bold text-gray-400 mb-3">Partial Withdraw:</h4><div className="flex gap-2 mb-3"><input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} placeholder={`Max: ${principal.toFixed(2)}`} className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white" max={principal} min="0" step="0.01" /><button onClick={handlePartialWithdraw} disabled={loading || !withdrawAmount || parseFloat(withdrawAmount)<=0 || parseFloat(withdrawAmount)>=principal} className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg font-bold text-white disabled:opacity-50 hover:scale-105 transition-all">Withdraw Partial</button></div></div>
+                  <div className="pt-4 border-t border-gray-700"><h4 className="text-sm font-bold text-gray-400 mb-3">Partial Withdraw:</h4><div className="flex gap-2 mb-3"><input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} placeholder={`Max: ${principal.toFixed(2)}`} className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white" max={principal} min="0" step="0.01" /><button onClick={handlePartialWithdraw} disabled={loading || !withdrawAmount || parseFloat(withdrawAmount)<=0 || parseFloat(withdrawAmount)>principal} className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg font-bold text-white disabled:opacity-50 hover:scale-105 transition-all">Withdraw Partial</button></div></div>
                   <button onClick={handleFullWithdraw} disabled={loading} className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-bold text-white hover:scale-105 transition-all">{loading ? 'Processing...' : 'Withdraw All'}</button>
                 </div>
               )}

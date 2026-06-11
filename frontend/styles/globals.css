@@ -9,6 +9,7 @@
 body {
   min-height: 100vh;
   transition: all 0.5s ease;
+  color: var(--text-color);
 }
 
 .glass-effect {
@@ -33,10 +34,21 @@ body {
   @apply px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg font-semibold transition-all hover:scale-105 text-white;
 }
 
-.news-ticker { animation: scroll 60s linear infinite; }
+/* Ticker com altura dobrada e rolagem contínua */
+.animate-marquee {
+  display: flex;
+  animation: scroll 80s linear infinite;
+  min-height: 80px;
+  align-items: center;
+}
+
 @keyframes scroll {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .card-hover { transition: all 0.3s ease; }
@@ -70,4 +82,18 @@ button:disabled.btn-glow-pink,
 button:disabled.btn-glow-purple {
   animation: none;
   box-shadow: none;
+}
+
+/* Ajustes de cores de texto para melhor contraste */
+.text-gray-300 {
+  color: #2c3e50 !important;
+}
+.text-gray-400, .text-gray-500 {
+  color: #1a2a3a !important;
+}
+.text-white {
+  color: #1a2a3a !important;
+}
+.text-cyan-400, .text-purple-400, .text-pink-400 {
+  filter: brightness(0.8);
 }

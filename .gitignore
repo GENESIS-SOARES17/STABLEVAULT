@@ -38,3 +38,6 @@ typechain-types/
 *.swp
 *.swo
 *~
+backend/.env
+.vercel
+.env*.local

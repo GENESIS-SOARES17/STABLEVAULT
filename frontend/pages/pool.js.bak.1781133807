@@ -66,31 +66,23 @@ export default function Pool() {
     } catch (e) { showToast(`Error: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
   };
 
-const handlePartialWithdraw = async () => {
-    if (!depositInfo || Number(depositInfo[0]) === 0) { showToast("No deposit found", "warning"); return; }
-    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) { showToast("Enter a valid amount", "warning"); return; }
+  const handlePartialWithdraw = async () => {
+    if (!depositInfo || Number(depositInfo[0]) === 0) { showToast('No deposit found', 'warning'); return; }
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) { showToast('Enter a valid amount', 'warning'); return; }
     const principal = Number(formatUnits(depositInfo[0], 18));
-    const amountNum = parseFloat(withdrawAmount);
-    if (amountNum >= principal) { showToast("Use Withdraw All to withdraw the full amount", "info"); return; }
+    if (parseFloat(withdrawAmount) >= principal) { showToast('Use Withdraw All for full amount', 'info'); return; }
     try {
-        setLoading(true);
-        setLastTxHash(null);
-        console.log("🔵 Partial withdraw amount:", amountNum);
-        const hash = await writeContractAsync({
-            address: CONTRACT_ADDRESS,
-            abi: CONTRACT_ABI,
-            functionName: "partialWithdraw",
-            args: [parseUnits(amountNum.toString(), 18)]
-        });
-        setLastTxHash(hash);
-        showToast(`Withdrew ${amountNum} LTUSDC!`, "success");
-        setWithdrawAmount("");
-        await Promise.all([refetchBalance(), refetchDeposit(), refetchTVL(), refetchDepositors()]);
-    } catch (e) {
-        console.error("❌ Partial withdraw error:", e);
-        showToast(`Error: ${e.shortMessage || e.message}`, "error");
-    } finally { setLoading(false); }
-}
+      setLoading(true); setLastTxHash(null);
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'partialWithdraw',
+        args: [parseUnits(withdrawAmount, 18)]
+      });
+      setLastTxHash(hash);
+      showToast(`Withdrew ${withdrawAmount} LTUSDC!`, 'success');
+      setWithdrawAmount('');
+      await Promise.all([refetchBalance(), refetchDeposit(), refetchTVL(), refetchDepositors()]);
+    } catch (e) { showToast(`Error: ${e.shortMessage || e.message}`, 'error'); } finally { setLoading(false); }
+  };
 
   const handleFullWithdraw = async () => {
     if (!depositInfo || Number(depositInfo[0]) === 0) { showToast('No deposit found', 'warning'); return; }

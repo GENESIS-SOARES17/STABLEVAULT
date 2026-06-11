@@ -22,20 +22,12 @@ export default function Staking() {
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', type: 'warning', stakeId: null, amount: null, isPartial: false });
   const { showToast } = useToast();
 
-  const enabled = !!address && STAKE_CONTRACT_ADDRESS !== "0x0";
+  const enabled = !!address && STAKE_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000";
 
-  const { data: balance, refetch: refetchBalance } = useReadContract({
-    address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'balanceOf', args: [address], query: { enabled }
-  });
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'allowance', args: [address, STAKE_CONTRACT_ADDRESS], query: { enabled }
-  });
-  const { data: totalStaked, refetch: refetchTotalStaked } = useReadContract({
-    address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStaked', query: { enabled }
-  });
-  const { data: totalStakers, refetch: refetchTotalStakers } = useReadContract({
-    address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStakers', query: { enabled }
-  });
+  const { data: balance, refetch: refetchBalance } = useReadContract({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'balanceOf', args: [address], query: { enabled } });
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'allowance', args: [address, STAKE_CONTRACT_ADDRESS], query: { enabled } });
+  const { data: totalStaked, refetch: refetchTotalStaked } = useReadContract({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStaked', query: { enabled } });
+  const { data: totalStakers, refetch: refetchTotalStakers } = useReadContract({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'getTotalStakers', query: { enabled } });
 
   const { writeContractAsync } = useWriteContract();
 
@@ -78,19 +70,13 @@ export default function Staking() {
       const allowanceNum = allowance ? Number(formatUnits(allowance, 18)) : 0;
       if (allowanceNum < amountNum) {
         showToast('Approving tokens...', 'info');
-        const approveHash = await writeContractAsync({
-          address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'approve',
-          args: [STAKE_CONTRACT_ADDRESS, parseUnits((amountNum * 2).toString(), 18)]
-        });
+        const approveHash = await writeContractAsync({ address: LTUSDC_ADDRESS, abi: ERC20_ABI, functionName: 'approve', args: [STAKE_CONTRACT_ADDRESS, parseUnits((amountNum * 2).toString(), 18)] });
         showToast(`Approved!`, 'success');
         setLastTxHash(approveHash);
         await new Promise(resolve => setTimeout(resolve, 3000));
         await refetchAllowance();
       }
-      const hash = await writeContractAsync({
-        address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'stake',
-        args: [parseUnits(amount, 18), selectedPlan.days]
-      });
+      const hash = await writeContractAsync({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'stake', args: [parseUnits(amount, 18), selectedPlan.days] });
       setLastTxHash(hash);
       showToast(`Staked ${amount} LTUSDC!`, 'success');
       setAmount('');
@@ -102,16 +88,8 @@ export default function Staking() {
   const handleWithdraw = (stakeId, stakeAmount, isPartial = false) => {
     const partialAmount = partialAmounts[stakeId];
     if (isPartial && (!partialAmount || parseFloat(partialAmount) <= 0)) { showToast('Enter a valid amount', 'warning'); return; }
-    if (isPartial && parseFloat(partialAmount) >= parseFloat(formatUnits(stakeAmount, 18))) { showToast('Use Withdraw All for full amount', 'info'); return; }
-    setConfirmModal({
-      isOpen: true,
-      title: isPartial ? 'Confirm Partial Withdraw' : 'Confirm Full Withdraw',
-      message: isPartial ? `Withdraw ${partialAmount} LTUSDC from stake #${stakeId}?\n\n⚠️ If before deadline: 50% penalty on interest portion` : `Withdraw entire stake #${stakeId}?\n\n⚠️ If before deadline: 50% penalty on interest`,
-      type: 'warning',
-      stakeId,
-      amount: isPartial ? partialAmount : null,
-      isPartial
-    });
+    if (isPartial && parseFloat(partialAmount) > parseFloat(formatUnits(stakeAmount, 18))) { showToast('Amount exceeds stake', 'warning'); return; }
+    setConfirmModal({ isOpen: true, title: isPartial ? 'Confirm Partial Withdraw' : 'Confirm Full Withdraw', message: isPartial ? `Withdraw ${partialAmount} LTUSDC from stake #${stakeId}?\n\n⚠️ If before deadline: 50% penalty on interest portion` : `Withdraw entire stake #${stakeId}?\n\n⚠️ If before deadline: 50% penalty on interest`, type: 'warning', stakeId, amount: isPartial ? partialAmount : null, isPartial });
   };
 
   const executeWithdraw = async () => {
@@ -121,16 +99,10 @@ export default function Staking() {
       setLastTxHash(null);
       let hash;
       if (confirmModal.isPartial && confirmModal.amount) {
-        hash = await writeContractAsync({
-          address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'partialUnstake',
-          args: [confirmModal.stakeId, parseUnits(confirmModal.amount, 18)]
-        });
+        hash = await writeContractAsync({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'partialUnstake', args: [confirmModal.stakeId, parseUnits(confirmModal.amount, 18)] });
         showToast(`Partial withdraw of ${confirmModal.amount} LTUSDC!`, 'success');
       } else {
-        hash = await writeContractAsync({
-          address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'unstake',
-          args: [confirmModal.stakeId]
-        });
+        hash = await writeContractAsync({ address: STAKE_CONTRACT_ADDRESS, abi: STAKE_ABI, functionName: 'unstake', args: [confirmModal.stakeId] });
         showToast(`Stake #${confirmModal.stakeId} withdrawn!`, 'success');
       }
       setLastTxHash(hash);
@@ -198,7 +170,7 @@ export default function Staking() {
                             <div className="flex-1"><div className="flex items-center gap-2 mb-2"><span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded font-bold">Stake #{stake.id}</span><span className={`text-xs px-2 py-1 rounded font-bold ${isUnlocked ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>{isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}</span></div><p className="text-white font-bold text-lg">{stakeAmount.toFixed(2)} LTUSDC</p><p className="text-xs text-gray-400">{stake.duration} days @ {stake.rewardRate/100}% / month</p><p className="text-sm text-cyan-400 mt-1">Interest: +{interest.toFixed(4)} LTUSDC</p>{!isUnlocked && <p className="text-xs text-yellow-400 mt-1">{daysRemaining} days left</p>}</div>
                             <button onClick={() => handleWithdraw(stake.id, stake.amount, false)} disabled={loading} className={`px-6 py-3 rounded-lg font-bold text-white disabled:opacity-50 hover:scale-105 transition-all flex items-center gap-2 ${isUnlocked ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-yellow-500 to-orange-500'}`}><FaTrash /> Withdraw All</button>
                           </div>
-                          <div className="pt-4 border-t border-gray-700"><p className="text-sm text-gray-400 mb-2">Partial Withdraw:</p><div className="flex gap-2"><input type="number" value={partialAmount} onChange={(e) => setPartialAmounts(prev => ({ ...prev, [stake.id]: e.target.value }))} placeholder={`Max: ${stakeAmount.toFixed(2)}`} className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white text-sm" max={stakeAmount} min="0" step="0.01" /><button onClick={() => handleWithdraw(stake.id, stake.amount, true)} disabled={loading || !partialAmount || parseFloat(partialAmount)<=0 || parseFloat(partialAmount)>=stakeAmount} className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg font-bold text-white text-sm disabled:opacity-50">Withdraw Partial</button></div></div>
+                          <div className="pt-4 border-t border-gray-700"><p className="text-sm text-gray-400 mb-2">Partial Withdraw:</p><div className="flex gap-2"><input type="number" value={partialAmount} onChange={(e) => setPartialAmounts(prev => ({ ...prev, [stake.id]: e.target.value }))} placeholder={`Max: ${stakeAmount.toFixed(2)}`} className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white text-sm" max={stakeAmount} min="0" step="0.01" /><button onClick={() => handleWithdraw(stake.id, stake.amount, true)} disabled={loading || !partialAmount || parseFloat(partialAmount)<=0 || parseFloat(partialAmount)>stakeAmount} className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg font-bold text-white text-sm disabled:opacity-50">Withdraw Partial</button></div></div>
                         </div>
                       </div>
                     );

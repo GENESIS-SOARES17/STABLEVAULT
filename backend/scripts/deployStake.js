@@ -15,7 +15,7 @@ async function main() {
   const StakeVault = await ethers.getContractFactory("StakeVault");
   const vault = await StakeVault.deploy(LTUSDC_ADDRESS, MONTHLY_RATE_BPS);
   await vault.waitForDeployment();
-  const vaultAddress = await vault.getAddress();
+  const vaultAddress = await vault.getAddress(); // ✅ corrigido
   console.log("✅ StakeVault deployed to:", vaultAddress);
 
   const LTUSDC = await ethers.getContractAt("IERC20", LTUSDC_ADDRESS);
@@ -24,7 +24,11 @@ async function main() {
   console.log("✅ StakeVault funded with", ethers.formatUnits(INITIAL_SUPPLY, 18), "LTUSDC");
 
   let env = fs.readFileSync(".env", "utf8");
-  env = env.replace(/STAKE_CONTRACT_ADDRESS=.*/, "STAKE_CONTRACT_ADDRESS=" + vaultAddress);
+  if (env.includes("STAKE_CONTRACT_ADDRESS=")) {
+    env = env.replace(/STAKE_CONTRACT_ADDRESS=.*/, "STAKE_CONTRACT_ADDRESS=" + vaultAddress);
+  } else {
+    env += "\nSTAKE_CONTRACT_ADDRESS=" + vaultAddress;
+  }
   fs.writeFileSync(".env", env);
   console.log("💾 Stake contract address saved to .env");
 }
