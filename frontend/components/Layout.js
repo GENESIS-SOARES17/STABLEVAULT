@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { FaHome, FaChartLine, FaHistory, FaUsers, FaCoins, FaTrophy, FaGlobe, FaTelegram, FaTwitter, FaBook } from 'react-icons/fa';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useTheme, THEMES } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
 
@@ -47,12 +48,19 @@ export default function Layout({ children }) {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-6">
-              {/* Logo / Título (sem imagem) */}
-              <Link href="/" className="group">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2">
-                  <span className="text-3xl font-bold gradient-text" style={{ fontFamily: 'Orbitron, sans-serif', letterSpacing: '2px' }}>SV</span>
-                  <span className="text-sm font-semibold text-gray-400 hidden md:inline">LIT-StableVault</span>
-                </motion.div>
+              {/* Logo / Ícone ao lado do texto */}
+              <Link href="/" className="group flex items-center gap-2">
+                <Image 
+                  src="/assets/images/icone2.png" 
+                  alt="Logo" 
+                  width={48} 
+                  height={48} 
+                  className="rounded-lg transition-transform group-hover:scale-105"
+                  priority
+                />
+                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300 hidden sm:inline">
+                  LIT-StableVault
+                </span>
               </Link>
               <div className="hidden md:flex items-center space-x-3">
                 {externalLinks.map((link, index) => {
@@ -89,6 +97,7 @@ export default function Layout({ children }) {
       <footer className="border-t py-8 mt-16 relative z-10 transition-all duration-500" style={{ background: theme.card, backdropFilter: 'blur(10px)', borderColor: theme.border, color: theme.text }}>
         <div className="container mx-auto px-4 text-center opacity-70">
           <div className="flex items-center justify-center space-x-2 mb-2">
+            <Image src="/assets/images/icone2.png" alt="Logo" width={24} height={24} className="rounded" />
             <span className="text-lg font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>LIT-StableVault</span>
           </div>
           <p className="text-sm mb-2">Interest Pool - {theme.name} Theme</p>
