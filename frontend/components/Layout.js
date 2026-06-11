@@ -47,34 +47,24 @@ export default function Layout({ children }) {
       >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center space-x-6">
-              {/* Logo / Ícone ao lado do texto */}
-              <Link href="/" className="group flex items-center gap-2">
-                <Image 
-                  src="/assets/images/icone2.png" 
-                  alt="Logo" 
-                  width={48} 
-                  height={48} 
-                  className="rounded-lg transition-transform group-hover:scale-105"
-                  priority
-                />
-                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300 hidden sm:inline">
-                  LIT-StableVault
-                </span>
-              </Link>
-              <div className="hidden md:flex items-center space-x-3">
-                {externalLinks.map((link, index) => {
-                  const Icon = link.icon;
-                  return (
-                    <motion.a key={index} href={link.href} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }} className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all hover:bg-white/10" style={{ color: theme.text }} title={link.label}>
-                      <Icon size={20} />
-                      <span className="text-sm font-medium" style={{ fontFamily: 'Orbitron, sans-serif' }}>{link.label}</span>
-                    </motion.a>
-                  );
-                })}
-              </div>
-            </div>
-            <nav className="flex items-center gap-3">
+            {/* Lado esquerdo: ícone + título */}
+            <Link href="/" className="group flex items-center gap-2 shrink-0">
+              <Image 
+                src="/assets/images/icone2.png" 
+                alt="Logo" 
+                width={96} 
+                height={96} 
+                className="rounded-lg transition-transform group-hover:scale-105"
+                priority
+              />
+              <span className="hidden sm:inline" style={{ fontFamily: "Orbitron, sans-serif", color: "#FFD700", textShadow: "2px 2px 0 #B8860B, 4px 4px 0 #8B4513", fontSize: "3rem", display: "inline-block", transform: "scaleX(2)", marginLeft: "0.5rem", marginRight: "1rem" }}>
+                LIT-StableVault
+              </span>
+            </Link>
+
+            {/* Lado direito: navegação + links externos + botão */}
+            <div className="flex items-center gap-3 flex-wrap justify-end">
+              {/* Links de navegação (Home, Pool, etc.) */}
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = router.pathname === item.href;
@@ -87,17 +77,44 @@ export default function Layout({ children }) {
                   </Link>
                 );
               })}
+
+              {/* Separador visual (opcional) */}
+              <div className="hidden md:block h-8 w-px bg-gray-500/30 mx-1" />
+
+              {/* Links externos (Guestbook, Testnet, Telegram, Twitter) */}
+              {externalLinks.map((link, index) => {
+                const Icon = link.icon;
+                return (
+                  <motion.a
+                    key={index}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden lg:flex items-center space-x-2 px-3 py-2 rounded-lg transition-all hover:bg-white/10"
+                    style={{ color: theme.text }}
+                    title={link.label}
+                  >
+                    <Icon size={18} />
+                    <span className="text-sm font-medium" style={{ fontFamily: 'Orbitron, sans-serif' }}>{link.label}</span>
+                  </motion.a>
+                );
+              })}
+
+              {/* Botão de conexão da carteira */}
               <ConnectButton showBalance={false} />
-            </nav>
+            </div>
           </div>
         </div>
       </motion.header>
+
       <main className="pb-20 md:pb-0 relative z-10">{children}</main>
       <ThemeSelector />
       <footer className="border-t py-8 mt-16 relative z-10 transition-all duration-500" style={{ background: theme.card, backdropFilter: 'blur(10px)', borderColor: theme.border, color: theme.text }}>
         <div className="container mx-auto px-4 text-center opacity-70">
           <div className="flex items-center justify-center space-x-2 mb-2">
-            <Image src="/assets/images/icone2.png" alt="Logo" width={24} height={24} className="rounded" />
+            <Image src="/assets/images/icone2.png" alt="Logo" width={32} height={32} className="rounded" />
             <span className="text-lg font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>LIT-StableVault</span>
           </div>
           <p className="text-sm mb-2">Interest Pool - {theme.name} Theme</p>
