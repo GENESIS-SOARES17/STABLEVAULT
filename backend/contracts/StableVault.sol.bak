@@ -24,11 +24,6 @@ contract StableVault is Ownable, ReentrancyGuard {
     address[] public depositors;
     mapping(address => bool) public isDepositor;
 
-    mapping(address => uint256) public lastCheckin;
-    uint256 public dailyRewardAmount = 100 * 10**18;
-
-    event CheckinReward(address indexed user, uint256 amount, uint256 timestamp);
-
     event AirdropClaimed(address indexed user, uint256 amount);
     event Minted(address indexed user, uint256 amount, uint256 fee);
     event Deposited(address indexed user, uint256 amount);
@@ -154,14 +149,6 @@ contract StableVault is Ownable, ReentrancyGuard {
             tvl += deposits[depositors[i]].amount;
         }
         return tvl;
-    }
-
-    function dailyCheckin() external nonReentrant {
-        require(block.timestamp >= lastCheckin[msg.sender] + 1 days, "Already claimed today");
-        require(ltusdc.balanceOf(address(this)) >= dailyRewardAmount, "Insufficient LTUSDC balance");
-        lastCheckin[msg.sender] = block.timestamp;
-        require(ltusdc.transfer(msg.sender, dailyRewardAmount), "Transfer failed");
-        emit CheckinReward(msg.sender, dailyRewardAmount, block.timestamp);
     }
 
     function withdrawFees() external onlyOwner {

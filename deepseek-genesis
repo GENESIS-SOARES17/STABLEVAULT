@@ -1,0 +1,10 @@
+https://chat.deepseek.com/a/chat/s/81f29162-80f4-4b92-b983-3d6ecab222e1
+
+
+
+iniciar localmente 
+
+
+
+cd /media/genesis/BACKUP/AIRDROIP/CONSTRUINDO/LIT-StableVault-DeepSeek-10-06-2026/frontend
+npm run dev

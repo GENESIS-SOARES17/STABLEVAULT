@@ -3,15 +3,14 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FaHome, FaChartLine, FaHistory, FaUsers, FaCoins, FaTrophy, FaGlobe, FaTelegram, FaTwitter, FaBook } from 'react-icons/fa';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useTheme, THEMES } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
 
 export default function Layout({ children }) {
   const router = useRouter();
-  const { currentTheme, changeTheme, themes } = useTheme(); // Agora sempre seguro
-  const theme = THEMES[currentTheme] || THEMES.cyberpunk;
+  const { currentTheme } = useTheme();
+  const theme = THEMES[currentTheme] || THEMES.orkut;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,16 +27,13 @@ export default function Layout({ children }) {
   ];
 
   const externalLinks = [
-    { href: 'https://guestbook-litvm-newcode.vercel.app/', icon: FaBook, label: 'Guestbook', color: 'hover:text-purple-400' },
-    { href: 'https://testnet.litvm.com/', icon: FaGlobe, label: 'Testnet', color: 'hover:text-cyan-400' },
-    { href: 'https://t.me/litecoinvm', icon: FaTelegram, label: 'Telegram', color: 'hover:text-blue-400' },
-    { href: 'https://x.com/LitecoinVM', icon: FaTwitter, label: 'Twitter', color: 'hover:text-sky-400' },
+    { href: 'https://guestbook-litvm-newcode.vercel.app/', icon: FaBook, label: 'Guestbook' },
+    { href: 'https://testnet.litvm.com/', icon: FaGlobe, label: 'Testnet' },
+    { href: 'https://t.me/litecoinvm', icon: FaTelegram, label: 'Telegram' },
+    { href: 'https://x.com/LitecoinVM', icon: FaTwitter, label: 'Twitter' },
   ];
 
-  // Se não montado, renderiza um placeholder vazio para evitar hidratação
-  if (!mounted) {
-    return <div className="min-h-screen" />;
-  }
+  if (!mounted) return <div className="min-h-screen" />;
 
   return (
     <div className="min-h-screen relative">
@@ -51,9 +47,11 @@ export default function Layout({ children }) {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-6">
+              {/* Logo / Título (sem imagem) */}
               <Link href="/" className="group">
-                <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative w-24 h-24 rounded-lg overflow-hidden border-2 group-hover:shadow-lg transition-all" style={{ borderColor: theme.accent }}>
-                  <Image src="/assets/images/icone.png" alt="LIT-StableVault" fill className="object-cover" priority />
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2">
+                  <span className="text-3xl font-bold gradient-text" style={{ fontFamily: 'Orbitron, sans-serif', letterSpacing: '2px' }}>SV</span>
+                  <span className="text-sm font-semibold text-gray-400 hidden md:inline">LIT-StableVault</span>
                 </motion.div>
               </Link>
               <div className="hidden md:flex items-center space-x-3">
@@ -91,8 +89,7 @@ export default function Layout({ children }) {
       <footer className="border-t py-8 mt-16 relative z-10 transition-all duration-500" style={{ background: theme.card, backdropFilter: 'blur(10px)', borderColor: theme.border, color: theme.text }}>
         <div className="container mx-auto px-4 text-center opacity-70">
           <div className="flex items-center justify-center space-x-2 mb-2">
-            <div className="w-6 h-6 relative"><Image src="/assets/images/icone.png" alt="Icon" fill className="object-contain" /></div>
-            <p className="text-lg font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>LIT-StableVault</p>
+            <span className="text-lg font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>LIT-StableVault</span>
           </div>
           <p className="text-sm mb-2">Interest Pool - {theme.name} Theme</p>
           <p className="text-xs opacity-50">Network: LitVM LiteForge Testnet (Chain ID: 4441)</p>
