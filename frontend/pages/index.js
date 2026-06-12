@@ -53,7 +53,7 @@ export default function Home() {
       const fee = mintFee || parseEther('0.0001');
       const hash = await writeContractAsync({ address: CONTRACT_ADDRESS, abi: CONTRACT_ABI, functionName: 'mintLTUSDC', value: fee });
       setLastTxHash(hash);
-      showToast(`Mintado 250 LTUSDC!`, 'success');
+      showToast(`Minted 250 LTUSDC!`, 'success');
     } catch (e) {
       console.error("❌ Mint error:", e);
       showToast(`Erro: ${e.shortMessage || e.message}`, 'error');
@@ -86,7 +86,7 @@ export default function Home() {
           <p className="text-sm text-cyan-400/70 mt-2">LIT-StableVault • Interest Pool</p>
           <p className="text-2xl text-gray-300 mt-4 mb-4">Interest Pool with Airdrop + Unlimited Minting</p>
           <p className="text-lg text-cyan-400/80 max-w-2xl mx-auto">
-            Ganhe {airdropValue} LTUSDC GRÁTIS na primeira conexão, depois minte {mintValue} LTUSDC por apenas {feeValue} zkLTC!
+            Get {airdropValue} LTUSDC FREE on first connection, then mint {mintValue} LTUSDC for only {feeValue} zkLTC!
           </p>
         </div>
 
